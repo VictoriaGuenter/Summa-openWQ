@@ -760,8 +760,7 @@ subroutine openwq_run_space_step(summa1_struc)
       OpenWQindex_r = -1
       iz_r          = -1
       ! *Flux*
-      !wflux_s2r = scalarSurfaceRunoff_summa_m3 ! NEEDS TO BE REVISED WHEN COUPLING WITH MIZROUTE
-      wflux_s2r = scalarRunoffVol_m3            ! NEEDS TO BE REVISED WHEN COUPLING WITH MIZROUTE
+      wflux_s2r = scalarSurfaceRunoff_summa_m3 
       ! *Call openwq_run_space* if wflux_s2r not 0
       err=openwq_obj%openwq_run_space(                       &
         simtime,                                      &
