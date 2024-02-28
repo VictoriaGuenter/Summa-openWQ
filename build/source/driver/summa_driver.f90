@@ -42,7 +42,6 @@ USE globalData, only: numtim                                ! number of model ti
 USE var_lookup, only: iLookTIME  ! named variables for time data structure
 USE var_lookup, only: iLookPROG  ! named variables for state variables
 
-USE globalData,only:gru_struc                               ! gru-hru mapping structures
 
 
 ! OpenWQ coupling 
