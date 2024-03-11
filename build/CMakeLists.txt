@@ -197,7 +197,7 @@ ENDIF()
 # compile openWQ into an object file
 ADD_LIBRARY(openWQ OBJECT ${OPENWQ_SOURCES} ${HYDROLINK_SOURCES})
 TARGET_INCLUDE_DIRECTORIES(openWQ PRIVATE
-                           $ENV{ARAMA_INCLUDES}
+                           $ENV{ARMA_INCLUDES}
                             ${HDF5_INCLUDE_DIRS}
                             ${OPENWQ_INCLUDES})
 

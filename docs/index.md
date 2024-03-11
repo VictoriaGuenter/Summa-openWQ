@@ -16,7 +16,32 @@ with the openWQ model. See below for more information on SUMMA.
 ### Local
 TODO: Add Instructions for local installation
 
-### HPC
+### HPC - Module System
+1. Load the necessary modules:
+   * `source load_modules.sh` (This file is located in the same directory as the readme)
+2. Install Armadillo
+   * `wget http://sourceforge.net/projects/arma/files/armadillo-10.3.0.tar.xz`
+   * `tar -xvf armadillo-10.3.0.tar.xz`
+   * `cd armadillo-10.3.0`
+   * `mkdir build && cd build`
+   * `cmake .. -D DETECT_HDF5=true -DCMAKE_C_FLAGS="-DH5_USE_110_API"`
+   * `make` (This will create the libs inside the build directory, `make install` will place the libries in the system directories which is not allowed on clusters. If you want to install the libraries in a specific directory, you can use the `CMAKE_INSTALL_PREFIX` flag in the cmake command)
+3. Ensure HDF5 support in Armadillo
+   * Open `armadillo_bits/config.hpp` and uncomment the line `#define ARMA_USE_HDF5`.
+   * The above file should be located in the `armadillo-10.3.0/include` directory if `make install` WAS NOT used.
+4. Compile openWQ
+   * cd into Summa-OpenWQ/build/
+   * Open `call_cmake.sh` and set the `ARMA_INCLUDES` variable to the full path 
+   of the `armadillo-10.3.0/include` directory. Set the `ARMA_LIB` 
+   variable to the full path of the `libarmadillo.so.10` library. If following 
+   the above instructions, the `libarmadillo.so.10` library will be located in the `armadillo-10.3.0/build` directory.
+   * Run `./call_cmake.sh`
+
+
+
+
+
+### HPC - Container
 1. Compile the Singularity image: `sudo singularity build openwq.sif utils/containers/summa_openwq/Apptainerfile.def`
    * NOTE: Most HPC systems do not allow sudo, so you will need to build the image on a system where you have sudo access and then copy the image to the HPC system.
 2. Once you have a singularity image, load the singularity module: `module load singularity`
@@ -33,7 +58,9 @@ TODO: Add Instructions for local installation
 
 ## Running
 
-### HPC
+### HPC - Module System
+
+### HPC - Container
 1. There is an example submission script for how to submit Summa-OpenWQ jobs to HPC systems using apptainer in `utils/hpc_submission/submission_script.sh`.
 2. The file serves as a base and can be modified to submit array jobs, etc.
 3. Each variable in the submission script is explained with comments.

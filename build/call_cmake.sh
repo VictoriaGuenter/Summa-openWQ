@@ -8,10 +8,11 @@ module load openblas/0.3.17
 module load netcdf-fortran/4.5.2 # HDF5/1.10.6
 module load boost
 
-export ARMA_INCLUDES=/home/kklenk/OpenWQ-Projects/local_libraries/armadillo-10.3.0/include
-export ARMA_LIB=/home/kklenk/OpenWQ-Projects/local_libraries/armadillo-10.3.0/libarmadillo.so.10
-EXEC_DIR=/home/kklenk/OpenWQ-Projects/Summa-openWQ/bin
+# Point ARMA_INCLUDES to the include directory of your Armadillo installation 
+export ARMA_INCLUDES=
+# Point ARMA_LIB to the libarmadillo.so.10 file of you Armadillo installation
+export ARMA_LIB=
 
 
-cmake -S. -B_build -D -DCOMPILE_TARGET=summa_openwq -DCMAKE_BUILD_TYPE=debug
+cmake -S. -B_build -DCOMPILE_TARGET=summa_openwq -DCMAKE_BUILD_TYPE=debug
 cmake --build _build -j 4
