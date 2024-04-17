@@ -24,31 +24,15 @@ CLASSWQ_openwq::CLASSWQ_openwq() {}
 CLASSWQ_openwq::~CLASSWQ_openwq() {}
 
 int CLASSWQ_openwq::decl(
-    int num_HRU,                // num HRU
+    int num_HRU,              
     int nCanopy_2openwq,      // num layers of canopy (fixed to 1)
     int nSnow_2openwq,        // num layers of snow (fixed to max of 5 because it varies)
     int nSoil_2openwq,        // num layers of snoil (variable)
     int nRunoff_2openwq,      // num layers in the runoff of SUMMA
     int nAquifer_2openwq,     // num layers of aquifer (fixed to 1)
-    int nYdirec_2openwq){           // num of layers in y-dir (set to 1 because not used in summa)
+    int nYdirec_2openwq){     // num of layers in y-dir (set to 1 because not used in summa)
 
-    OpenWQ_hostModelconfig_ref = new OpenWQ_hostModelconfig();
-    OpenWQ_couplercalls_ref = new OpenWQ_couplercalls();
-    OpenWQ_json_ref = new OpenWQ_json();
-    OpenWQ_wqconfig_ref = new OpenWQ_wqconfig();
-    OpenWQ_units_ref = new OpenWQ_units();
-    OpenWQ_utils_ref = new OpenWQ_utils();
-    OpenWQ_readjson_ref = new OpenWQ_readjson();
-    OpenWQ_initiate_ref = new OpenWQ_initiate();
-    OpenWQ_watertransp_ref = new OpenWQ_watertransp();
-    OpenWQ_chem_ref = new OpenWQ_chem();
-    OpenWQ_extwatflux_ss_ref = new OpenWQ_extwatflux_ss();
-    OpenWQ_output_ref = new OpenWQ_output();
-    
     this->num_HRU = num_HRU;
-
-    // setting the number of output dimentions to be num_HRU to be used in annother scope
-    // OpenWQ_output_ref->setNumDimensions(num_HRU);
 
     if (OpenWQ_hostModelconfig_ref->get_num_HydroComp()==0) {
 
@@ -65,8 +49,9 @@ int CLASSWQ_openwq::decl(
         OpenWQ_hostModelconfig_ref->add_HydroExtFlux(0,"PRECIP", num_HRU,nYdirec_2openwq,1);
 
 
-        OpenWQ_vars_ref = new OpenWQ_vars(OpenWQ_hostModelconfig_ref->get_num_HydroComp(),
-                                          OpenWQ_hostModelconfig_ref->get_num_HydroExtFlux());
+        OpenWQ_vars_ref = std::make_unique<OpenWQ_vars>(
+            OpenWQ_hostModelconfig_ref->get_num_HydroComp(),
+            OpenWQ_hostModelconfig_ref->get_num_HydroExtFlux());
 
         
         // Dependencies
@@ -81,7 +66,7 @@ int CLASSWQ_openwq::decl(
             std::cerr << "\nERROR: Path to OpenWQ_master.json does not exist !!\n"
                       << "Please set the environment variable 'master_json' "
                       << "to the path of the OpenWQ_master.json file.\n";
-            exit(1);
+            exit(EXIT_FAILURE);
         }
         OpenWQ_wqconfig_ref->set_OpenWQ_masterjson(master_json);
 

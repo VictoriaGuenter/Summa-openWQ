@@ -47,20 +47,34 @@ class CLASSWQ_openwq
     // Instance Variables
     private:
 
-        OpenWQ_couplercalls *OpenWQ_couplercalls_ref;
-        OpenWQ_hostModelconfig *OpenWQ_hostModelconfig_ref;
-        OpenWQ_json *OpenWQ_json_ref;
-        OpenWQ_wqconfig *OpenWQ_wqconfig_ref;
-        OpenWQ_units *OpenWQ_units_ref;
-        OpenWQ_utils *OpenWQ_utils_ref;
-        OpenWQ_readjson *OpenWQ_readjson_ref;
-        OpenWQ_vars *OpenWQ_vars_ref;
-        OpenWQ_initiate *OpenWQ_initiate_ref;
-        OpenWQ_watertransp *OpenWQ_watertransp_ref;
-        OpenWQ_chem *OpenWQ_chem_ref;            
-        OpenWQ_extwatflux_ss *OpenWQ_extwatflux_ss_ref;
-        OpenWQ_solver *OpenWQ_solver_ref;
-        OpenWQ_output *OpenWQ_output_ref;
+        std::unique_ptr<OpenWQ_hostModelconfig> OpenWQ_hostModelconfig_ref =
+            std::make_unique<OpenWQ_hostModelconfig>();
+        std::unique_ptr<OpenWQ_couplercalls> OpenWQ_couplercalls_ref =
+            std::make_unique<OpenWQ_couplercalls>();
+        std::unique_ptr<OpenWQ_json> OpenWQ_json_ref = 
+            std::make_unique<OpenWQ_json>();
+        std::unique_ptr<OpenWQ_wqconfig> OpenWQ_wqconfig_ref = 
+            std::make_unique<OpenWQ_wqconfig>();
+        std::unique_ptr<OpenWQ_units> OpenWQ_units_ref = 
+            std::make_unique<OpenWQ_units>();
+        std::unique_ptr<OpenWQ_utils> OpenWQ_utils_ref = 
+            std::make_unique<OpenWQ_utils>();
+        std::unique_ptr<OpenWQ_readjson> OpenWQ_readjson_ref = 
+            std::make_unique<OpenWQ_readjson>();
+        std::unique_ptr<OpenWQ_initiate> OpenWQ_initiate_ref = 
+            std::make_unique<OpenWQ_initiate>();
+        std::unique_ptr<OpenWQ_watertransp> OpenWQ_watertransp_ref = 
+            std::make_unique<OpenWQ_watertransp>();
+        std::unique_ptr<OpenWQ_chem> OpenWQ_chem_ref = 
+            std::make_unique<OpenWQ_chem>();
+        std::unique_ptr<OpenWQ_extwatflux_ss> OpenWQ_extwatflux_ss_ref = 
+            std::make_unique<OpenWQ_extwatflux_ss>();
+        std::unique_ptr<OpenWQ_solver> OpenWQ_solver_ref = 
+            std::make_unique<OpenWQ_solver>();
+        std::unique_ptr<OpenWQ_output> OpenWQ_output_ref = 
+            std::make_unique<OpenWQ_output>();
+
+        std::unique_ptr<OpenWQ_vars> OpenWQ_vars_ref; // Requires input from summa 
 
         int num_HRU;
         const float *hru_area;
