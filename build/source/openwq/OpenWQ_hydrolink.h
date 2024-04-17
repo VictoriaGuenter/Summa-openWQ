@@ -31,6 +31,7 @@
 #include <iostream>
 #include <time.h>
 #include <vector>
+#include <filesystem>
 
 // Global Indexes for Compartments
   inline int canopy_index_openwq    = 0;
