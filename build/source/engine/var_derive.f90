@@ -25,19 +25,15 @@ USE nrtype
 
 ! derived types to define the data structures
 USE data_types,only:var_ilength    ! x%var(:)%dat (i4b)
-USE data_types,only:var_dlength    ! x%var(:)%dat (dp)
-
+USE data_types,only:var_dlength    ! x%var(:)%dat (rkind)
 ! named variables for snow and soil
 USE globalData,only:iname_snow     ! named variables for snow
 USE globalData,only:iname_soil     ! named variables for soil
-
 ! named variables
 USE globalData,only:data_step      ! time step of forcing data
-
 ! named variables
 USE var_lookup,only:iLookPARAM,iLookINDEX,iLookPROG,iLookDIAG,iLookFLUX        ! HRU: named variables for structure elements
 USE var_lookup,only:iLookBVAR,iLookBPAR                                        ! GRU: named variables for structure elements
-
 ! model decision structures
 USE globalData,only:model_decisions        ! model decision structure
 USE var_lookup,only:iLookDECISIONS         ! named variables for elements of the decision structure
@@ -49,8 +45,8 @@ USE mDecisions_module,only: &
 
 ! look-up values for the choice of groundwater parameterization
 USE mDecisions_module,only: &
- bigBucket,                  & ! a big bucket (lumped aquifer model)
- noExplicit                    ! no explicit groundwater parameterization
+ bigBucket,                 & ! a big bucket (lumped aquifer model)
+ noExplicit                   ! no explicit groundwater parameterization
 
 ! look-up values for the choice of groundwater parameterization
 USE mDecisions_module,only: &
@@ -58,9 +54,9 @@ USE mDecisions_module,only: &
  powerLaw_profile             ! power-law profile
 
 ! look-up values for the sub-grid routing method
-USE mDecisions_module,only:      &
- timeDelay,&  ! time-delay histogram
- qInstant     ! instantaneous routing
+USE mDecisions_module,only: &
+ timeDelay,                 & ! time-delay histogram
+ qInstant                     ! instantaneous routing
 
 ! privacy
 implicit none
@@ -122,12 +118,6 @@ contains
   iLayerHeight(iLayer) = iLayerHeight(iLayer-1) + mLayerDepth(iLayer)
  end do ! (looping through layers)
 
- !print*, 'layerType   = ',  layerType
- !print*, 'mLayerDepth = ',  mLayerDepth
- !print*, 'mLayerHeight = ', mLayerHeight
- !print*, 'iLayerHeight = ', iLayerHeight
- !print*, '************** '
-
  ! end association to variables in the data structure
  end associate
 
@@ -149,10 +139,10 @@ contains
  character(*),intent(out)        :: message         ! error message
  ! declare local variables
  integer(i4b)                    :: iLayer          ! loop through layers
- real(rkind)                        :: fracRootLower   ! fraction of the rooting depth at the lower interface
- real(rkind)                        :: fracRootUpper   ! fraction of the rooting depth at the upper interface
- real(rkind), parameter             :: rootTolerance = 0.05_rkind ! tolerance for error in doubleExp rooting option
- real(rkind)                        :: error           ! machine precision error in rooting distribution
+ real(rkind)                     :: fracRootLower   ! fraction of the rooting depth at the lower interface
+ real(rkind)                     :: fracRootUpper   ! fraction of the rooting depth at the upper interface
+ real(rkind), parameter          :: rootTolerance = 0.05_rkind ! tolerance for error in doubleExp rooting option
+ real(rkind)                     :: error           ! machine precision error in rooting distribution
  ! initialize error control
  err=0; message='rootDensty/'
 
@@ -178,9 +168,6 @@ contains
  ) ! end associate
  ! ----------------------------------------------------------------------------------
 
- !print*, 'nSnow   = ', nSnow
- !print*, 'nLayers = ', nLayers
-
  ! compute the fraction of roots in each soil layer
  do iLayer=nSnow+1,nLayers
 
@@ -203,8 +190,6 @@ contains
     else
      mLayerRootDensity(iLayer-nSnow) = 0._rkind
     end if
-    !write(*,'(a,10(f11.5,1x))') 'mLayerRootDensity(iLayer-nSnow), fracRootUpper, fracRootLower = ', &
-    !                             mLayerRootDensity(iLayer-nSnow), fracRootUpper, fracRootLower
 
    ! ** option 2: double expoential profile of Zeng et al. (JHM 2001)
    case(doubleExp)
@@ -213,9 +198,7 @@ contains
     fracRootUpper = 1._rkind - 0.5_rkind*(exp(-iLayerHeight(iLayer  )*rootScaleFactor1) + exp(-iLayerHeight(iLayer  )*rootScaleFactor2) )
     ! compute the root density
     mLayerRootDensity(iLayer-nSnow) = fracRootUpper - fracRootLower
-    !write(*,'(a,10(f11.5,1x))') 'mLayerRootDensity(iLayer-nSnow), fracRootUpper, fracRootLower = ', &
-    !                             mLayerRootDensity(iLayer-nSnow), fracRootUpper, fracRootLower
-
+    
    ! ** check
    case default; err=20; message=trim(message)//'unable to identify option for rooting profile'; return
 
@@ -274,8 +257,8 @@ contains
  character(*),intent(out)        :: message             ! error message
  ! declare local variables
  integer(i4b)                    :: iLayer              ! loop through layers
- real(rkind)                        :: ifcDepthScaleFactor ! depth scaling factor (layer interfaces)
- real(rkind)                        :: midDepthScaleFactor ! depth scaling factor (layer midpoints)
+ real(rkind)                     :: ifcDepthScaleFactor ! depth scaling factor (layer interfaces)
+ real(rkind)                     :: midDepthScaleFactor ! depth scaling factor (layer midpoints)
  ! initialize error control
  err=0; message='satHydCond/'
  ! ----------------------------------------------------------------------------------
@@ -326,13 +309,13 @@ contains
    case(powerLaw_profile)
     ! - conductivity at layer interfaces
     !   --> NOTE: Do we need a weighted average based on layer depth for interior layers?
-    
+
     if(compactedDepth/iLayerHeight(nLayers) /= 1._rkind) then    ! avoid divide by zero
      ifcDepthScaleFactor = ( (1._rkind - iLayerHeight(iLayer)/iLayerHeight(nLayers))**(zScale_TOPMODEL - 1._rkind) ) / &
                            ( (1._rkind -       compactedDepth/iLayerHeight(nLayers))**(zScale_TOPMODEL - 1._rkind) )
     else
      ifcDepthScaleFactor = 1.0_rkind
-    endif                           
+    endif
     if(iLayer==nSnow)then
      iLayerSatHydCond(iLayer-nSnow) = k_soil(1) * ifcDepthScaleFactor
     else   ! if the mid-point of a layer
@@ -347,16 +330,10 @@ contains
                             ( (1._rkind -       compactedDepth/iLayerHeight(nLayers))**(zScale_TOPMODEL - 1._rkind) )
      else
       midDepthScaleFactor = 1.0_rkind
-     endif                            
+     endif
      mLayerSatHydCond(iLayer-nSnow)   = k_soil(iLayer-nSnow)      * midDepthScaleFactor
      mLayerSatHydCondMP(iLayer-nSnow) = k_macropore(iLayer-nSnow) * midDepthScaleFactor
-    end if  
- 
-    !print*, 'compactedDepth = ', compactedDepth
-    !print*, 'k_macropore    = ', k_macropore
-    !print*, 'mLayerHeight(iLayer) = ', mLayerHeight(iLayer)
-    !print*, 'iLayerHeight(nLayers) = ', iLayerHeight(nLayers)
-    !print*, 'iLayer, mLayerSatHydCondMP(iLayer-nSnow) = ', mLayerSatHydCondMP(iLayer-nSnow)
+    end if
 
    ! error check (errors checked earlier also, so should not get here)
    case default
@@ -364,12 +341,18 @@ contains
     err=10; return
 
   end select
-  !if(iLayer > nSnow)& ! avoid layer 0
-  ! write(*,'(a,1x,i4,1x,2(f11.5,1x,e20.10,1x))') 'satHydCond: ', iLayer, mLayerHeight(iLayer), mLayerSatHydCond(iLayer-nSnow), iLayerHeight(iLayer), iLayerSatHydCond(iLayer-nSnow)
+
+  ! check that the hydraulic conductivity for macropores is greater than for micropores
+  if (iLayer > nSnow) then
+   if( mLayerSatHydCondMP(iLayer-nSnow) < mLayerSatHydCond(iLayer-nSnow) )then
+    write(*,'(2(a,e12.6),a,i0)')trim(message)//'WARNING: hydraulic conductivity for macropores [', mLayerSatHydCondMP(iLayer-nSnow), &
+                                               '] is less than the hydraulic conductivity for micropores [', mLayerSatHydCond(iLayer-nSnow), &
+                                               ']: resetting macropore conductivity to equal micropore value. Layer = ', iLayer
+    mLayerSatHydCondMP(iLayer-nSnow) = mLayerSatHydCond(iLayer-nSnow)
+   endif  ! if mLayerSatHydCondMP < mLayerSatHydCond
+  end if ! if iLayer > nSnow
  end do  ! looping through soil layers
- !print*, trim(model_decisions(iLookDECISIONS%hc_profile)%cDecision)
- !print*, 'k_soil, k_macropore, zScale_TOPMODEL = ', k_soil, k_macropore, zScale_TOPMODEL
- !pause ' in satHydCond'
+
  end associate
 
  end subroutine satHydCond
@@ -380,25 +363,24 @@ contains
  ! **********************************************************************************************************
  subroutine fracFuture(bpar_data,bvar_data,err,message)
  ! external functions
- USE soil_utils_module,only:gammp                     ! compute the cumulative probabilty based on the Gamma distribution
+ USE soil_utils_module,only:gammp ! compute the cumulative probabilty based on the Gamma distribution
 
  implicit none
  ! input variables
- real(rkind),intent(in)             :: bpar_data(:)           ! vector of basin-average model parameters
+ real(rkind),intent(in)          :: bpar_data(:)         ! vector of basin-average model parameters
  ! output variables
- type(var_dlength),intent(inout) :: bvar_data              ! data structure of basin-average model variables
- integer(i4b),intent(out)        :: err                    ! error code
- character(*),intent(out)        :: message                ! error message
+ type(var_dlength),intent(inout) :: bvar_data            ! data structure of basin-average model variables
+ integer(i4b),intent(out)        :: err                  ! error code
+ character(*),intent(out)        :: message              ! error message
  ! internal
- real(rkind)                        :: dt                     ! data time step (s)
- integer(i4b)                    :: nTDH                   ! number of points in the time-delay histogram
- integer(i4b)                    :: iFuture                ! index in time delay histogram
- real(rkind)                        :: aLambda                ! scale parameter in the Gamma distribution
- real(rkind)                        :: tFuture                ! future time (end of step)
- real(rkind)                        :: pSave                  ! cumulative probability at the start of the step
- real(rkind)                        :: cumProb                ! cumulative probability at the end of the step
- real(rkind)                        :: sumFrac                ! sum of runoff fractions in all steps
- real(rkind),parameter              :: tolerFrac=0.01_rkind      ! tolerance for missing fractional runoff by truncating histogram
+ real(rkind)                     :: dt                   ! data time step (s)
+ integer(i4b)                    :: nTDH                 ! number of points in the time-delay histogram
+ integer(i4b)                    :: iFuture              ! index in time delay histogram
+ real(rkind)                     :: tFuture              ! future time (end of step)
+ real(rkind)                     :: pSave                ! cumulative probability at the start of the step
+ real(rkind)                     :: cumProb              ! cumulative probability at the end of the step
+ real(rkind)                     :: sumFrac              ! sum of runoff fractions in all steps
+ real(rkind),parameter           :: tolerFrac=0.01_rkind ! tolerance for missing fractional runoff by truncating histogram
  ! initialize error control
  err=0; message='fracFuture/'
  ! ----------------------------------------------------------------------------------
@@ -433,8 +415,7 @@ contains
   case(timeDelay)
    ! initialize
    pSave   = 0._rkind ! cumulative probability at the start of the step
-   aLambda = routingGammaShape / routingGammaScale
-   if(routingGammaShape <= 0._rkind .or. aLambda < 0._rkind)then
+   if(routingGammaShape <= 0._rkind .or. routingGammaScale <= 0._rkind)then
     message=trim(message)//'bad arguments for the Gamma distribution'
     err=20; return
    end if
@@ -442,8 +423,8 @@ contains
    do iFuture = 1,nTDH
     ! get weight for a given bin
     tFuture = real(iFuture, kind(dt))*dt                  ! future time (end of step)
-    cumProb = gammp(routingGammaShape,aLambda*tFuture)    ! cumulative probability at the end of the step
-    fractionFuture(iFuture) = max(0._rkind, cumProb - pSave) ! fraction of runoff in the current step
+    cumProb = gammp(routingGammaShape,tFuture/routingGammaScale) ! cumulative probability at the end of the step
+    fractionFuture(iFuture) = max(0._rkind, cumProb - pSave)     ! fraction of runoff in the current step
     pSave   = cumProb                                     ! save the cumulative probability for use in the next step
     !write(*,'(a,1x,i4,1x,3(f20.10,1x))') trim(message), iFuture, tFuture, cumProb, fractionFuture(iFuture)
     ! set remaining bins to zero
@@ -456,10 +437,13 @@ contains
    ! check that we have enough bins
    sumFrac  = sum(fractionFuture)
    if(abs(1._rkind - sumFrac) > tolerFrac)then
-    write(*,*) 'fraction of basin runoff histogram being accounted for by time delay vector is ', sumFrac
-    write(*,*) 'this is less than allowed by tolerFrac = ', tolerFrac
-    message=trim(message)//'not enough bins for the time delay histogram -- fix hard-coded parameter in globalData.f90'
-    err=20; return
+    write(*,*) 'WARNING: The fraction of basin runoff histogram being accounted for by time delay vector is ', sumFrac
+    write(*,*) 'This is less than allowed by tolerFrac = ', tolerFrac
+    write(*,*) 'This means that we do not have enough bins for the time delay histogram'
+    write(*,*) 'Solutions:'
+    write(*,*) ' (1) Check that the values of routingGammaShape and routingGammaScale are appropriate (and fix if necessary); or'
+    write(*,*) ' (2) Increase the hard coded parameter nTimeDelay in globalData.f90 (currently nTimeDelay is set to ', nTDH, ')'
+    write(*,*) '       -- note that nTimeDelay defines the number of time steps in the time delay histogram'
    end if
    ! ensure the fraction sums to one
    fractionFuture = fractionFuture/sumFrac
@@ -491,8 +475,8 @@ contains
  ! associate variables in data structure
  associate(&
  ! associate values in the parameter structures
- vGn_n          =>mpar_data%var(iLookPARAM%vGn_n)%dat,                  & ! van Genutchen "n" parameter (-)
- vGn_m          =>diag_data%var(iLookDIAG%scalarVGn_m)%dat              & ! van Genutchen "m" parameter (-)
+ vGn_n          =>mpar_data%var(iLookPARAM%vGn_n)%dat,       & ! van Genutchen "n" parameter (-)
+ vGn_m          =>diag_data%var(iLookDIAG%scalarVGn_m)%dat   & ! van Genutchen "m" parameter (-)
  ) ! end associate
  ! ----------------------------------------------------------------------------------
 
